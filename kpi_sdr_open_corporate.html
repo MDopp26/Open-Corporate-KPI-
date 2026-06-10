@@ -1,0 +1,650 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KPI SDR — Open Corporate</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#080F28;--s1:#0D1535;--s2:#111D42;--s3:#172248;
+  --bd:#1D2E58;--bd2:#253669;
+  --gold:#C8A951;--gold2:#E6C96A;--gold-bg:#1A1206;--gold-bd:#4A3510;
+  --teal:#0FC4B5;--teal-bg:#041A18;--teal-bd:#0A4A44;
+  --purple:#8B7EE0;--purple-bg:#120F2C;--purple-bd:#2D276A;
+  --coral:#F07C5A;--coral-bg:#1C0C06;--coral-bd:#5A2010;
+  --red:#E05A5A;--red-bg:#1C0606;--red-bd:#5A1010;
+  --green:#3DD68C;--green-bg:#041A0E;--green-bd:#0A4A26;
+  --txt:#D8E4F6;--txt2:#7A95BE;--txt3:#3D5278;
+}
+body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(--txt);min-height:100vh;padding:24px 18px 80px}
+body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(circle,rgba(200,169,81,.06) 1px,transparent 1px);background-size:28px 28px;pointer-events:none;z-index:0}
+.wrap{max-width:960px;margin:0 auto;position:relative;z-index:1}
+
+/* ─── HEADER ─── */
+.hdr{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:24px;flex-wrap:wrap}
+.brand{font-size:10px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:var(--gold);border:1px solid var(--gold-bd);background:var(--gold-bg);padding:3px 10px;border-radius:4px;display:inline-block;margin-bottom:8px}
+.hdr-title{font-size:26px;font-weight:800;line-height:1.1;color:#fff;letter-spacing:-.02em}
+.hdr-title em{font-style:normal;color:var(--gold)}
+.hdr-right{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+
+/* ─── WEEK NAV ─── */
+.week-nav{display:flex;align-items:center;gap:8px;background:var(--s1);border:1px solid var(--bd);border-radius:10px;padding:6px 10px}
+.week-nav button{background:transparent;border:none;color:var(--txt2);cursor:pointer;font-size:16px;line-height:1;padding:0 4px;transition:color .15s}
+.week-nav button:hover{color:var(--gold)}
+.week-label{font-size:12px;font-weight:700;color:#fff;white-space:nowrap;min-width:110px;text-align:center}
+
+/* ─── SDR TABS ─── */
+.tabs{display:flex;gap:6px;margin-bottom:20px;flex-wrap:wrap}
+.tab{padding:7px 16px;border-radius:8px;border:1px solid var(--bd);background:var(--s1);color:var(--txt2);font-size:12px;font-weight:700;cursor:pointer;transition:all .15s;letter-spacing:.03em}
+.tab:hover{border-color:var(--bd2);color:var(--txt)}
+.tab.active{background:var(--s3);border-color:var(--gold);color:var(--gold)}
+.tab .dot{display:inline-block;width:6px;height:6px;border-radius:50%;margin-right:6px;vertical-align:middle}
+
+/* ─── KPI CARDS ─── */
+.kpi-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-bottom:20px}
+.kcard{background:var(--s1);border:1px solid var(--bd);border-radius:12px;padding:14px 16px;position:relative;overflow:hidden;cursor:pointer;transition:border-color .15s}
+.kcard:hover{border-color:var(--bd2)}
+.kcard::before{content:'';position:absolute;top:0;left:0;right:0;height:3px}
+.kc-disc::before{background:var(--purple)}
+.kc-cont::before{background:var(--teal)}
+.kc-qual::before{background:#E6C96A}
+.kc-agd::before{background:var(--gold)}
+.kc-real::before{background:var(--green)}
+.kc-noshow::before{background:var(--coral)}
+.kcard-label{font-size:10px;font-weight:600;color:var(--txt3);text-transform:uppercase;letter-spacing:.09em;margin-bottom:8px}
+.kcard-val{font-size:28px;font-weight:800;color:#fff;line-height:1}
+.kcard-meta{font-size:11px;color:var(--txt3);margin-top:4px}
+.kcard-meta b{font-weight:700}
+.kcard-meta.ok{color:var(--green)}
+.kcard-meta.warn{color:var(--gold)}
+.kcard-meta.bad{color:var(--coral)}
+.kcard-bar{height:4px;background:var(--bd);border-radius:4px;margin-top:10px;overflow:hidden}
+.kcard-bar-fill{height:4px;border-radius:4px;transition:width .5s ease}
+
+/* ─── FUNIL ─── */
+.funil-section{background:var(--s1);border:1px solid var(--bd);border-radius:14px;padding:20px;margin-bottom:20px}
+.section-title{font-size:12px;font-weight:700;color:var(--txt2);text-transform:uppercase;letter-spacing:.1em;margin-bottom:16px;display:flex;align-items:center;gap:8px}
+.section-title::after{content:'';flex:1;height:1px;background:var(--bd)}
+.funil-steps{display:flex;flex-direction:column;gap:8px}
+.fstep{display:flex;align-items:center;gap:12px}
+.fstep-label{font-size:12px;font-weight:600;color:var(--txt2);width:160px;flex-shrink:0}
+.fstep-bar-wrap{flex:1;background:var(--bd);border-radius:4px;height:24px;overflow:hidden;position:relative}
+.fstep-bar-fill{height:100%;border-radius:4px;transition:width .5s ease;display:flex;align-items:center;padding-left:10px}
+.fstep-bar-fill span{font-size:11px;font-weight:700;color:#fff;white-space:nowrap}
+.fstep-conv{font-size:11px;font-weight:700;width:52px;text-align:right;flex-shrink:0}
+.fstep-n{font-size:13px;font-weight:800;color:#fff;width:32px;text-align:right;flex-shrink:0}
+
+/* ─── TABELA DIÁRIA ─── */
+.table-section{background:var(--s1);border:1px solid var(--bd);border-radius:14px;padding:20px;margin-bottom:20px;overflow:hidden}
+.table-scroll{overflow-x:auto}
+table{width:100%;border-collapse:collapse;min-width:560px}
+thead th{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--txt3);padding:8px 12px;text-align:center;border-bottom:1px solid var(--bd);white-space:nowrap}
+thead th:first-child{text-align:left}
+tbody tr{border-bottom:1px solid var(--bd);transition:background .12s}
+tbody tr:last-child{border-bottom:none}
+tbody tr:hover{background:var(--s2)}
+tbody td{padding:10px 12px;font-size:13px;font-weight:500;color:var(--txt);text-align:center;vertical-align:middle}
+tbody td:first-child{text-align:left;color:var(--txt2);font-size:12px;font-weight:600}
+.input-cell{background:transparent;border:none;color:var(--txt);font-family:'Plus Jakarta Sans',sans-serif;font-size:13px;font-weight:700;text-align:center;width:52px;padding:4px 6px;border-radius:6px;transition:background .15s}
+.input-cell:focus{outline:none;background:var(--s3)}
+.input-cell:hover{background:var(--s2)}
+tfoot td{padding:10px 12px;font-size:12px;font-weight:800;text-align:center;color:var(--gold);border-top:1px solid var(--bd2)}
+tfoot td:first-child{text-align:left;color:var(--txt2);font-size:11px;text-transform:uppercase;letter-spacing:.08em}
+
+/* ─── CONSOLIDADO SDRS ─── */
+.sdr-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:12px;margin-bottom:20px}
+.sdr-card{background:var(--s1);border:1px solid var(--bd);border-radius:14px;padding:18px;overflow:hidden}
+.sdr-header{display:flex;align-items:center;gap:10px;margin-bottom:14px}
+.sdr-avatar{width:36px;height:36px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:800;flex-shrink:0}
+.av-a{background:#1A1A3A;color:var(--purple);border:1px solid var(--purple-bd)}
+.av-b{background:#041A18;color:var(--teal);border:1px solid var(--teal-bd)}
+.av-c{background:#1C0C06;color:var(--coral);border:1px solid var(--coral-bd)}
+.sdr-name{font-size:13px;font-weight:700;color:#fff}
+.sdr-type{font-size:10px;font-weight:600;color:var(--txt3);text-transform:uppercase;letter-spacing:.08em;margin-top:2px}
+.sdr-metrics{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px}
+.sm{background:var(--s2);border-radius:8px;padding:10px 8px;text-align:center}
+.sm-val{font-size:18px;font-weight:800;color:#fff}
+.sm-label{font-size:9px;color:var(--txt3);text-transform:uppercase;letter-spacing:.08em;margin-top:2px;font-weight:600}
+.sdr-progress{margin-top:12px}
+.sp-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:4px}
+.sp-label{font-size:11px;color:var(--txt3);font-weight:600}
+.sp-pct{font-size:11px;font-weight:800;color:var(--gold)}
+.sp-track{background:var(--bd);border-radius:4px;height:5px;overflow:hidden}
+.sp-fill{height:5px;border-radius:4px;background:linear-gradient(90deg,var(--teal),var(--gold));transition:width .5s}
+
+/* ─── SAVE BAR ─── */
+.savebar{position:fixed;bottom:0;left:0;right:0;background:var(--s1);border-top:1px solid var(--bd);padding:10px 24px;display:flex;align-items:center;justify-content:space-between;z-index:100;gap:12px}
+.save-btn{background:var(--gold);color:#080F28;font-family:'Plus Jakarta Sans',sans-serif;font-size:12px;font-weight:800;padding:8px 20px;border-radius:8px;border:none;cursor:pointer;letter-spacing:.05em;transition:opacity .15s}
+.save-btn:hover{opacity:.85}
+.save-msg{font-size:11px;color:var(--txt3);letter-spacing:.04em}
+.week-meta{font-size:11px;color:var(--txt3)}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- HEADER -->
+  <div class="hdr">
+    <div>
+      <div class="brand">Open Corporate</div>
+      <div class="hdr-title">Dashboard <em>SDR</em></div>
+    </div>
+    <div class="hdr-right">
+      <div class="week-nav">
+        <button onclick="changeWeek(-1)">‹</button>
+        <span class="week-label" id="week-label">—</span>
+        <button onclick="changeWeek(1)">›</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- TABS -->
+  <div class="tabs">
+    <div class="tab active" onclick="setTab('geral')" id="tab-geral"><span class="dot" style="background:var(--gold)"></span>Consolidado</div>
+    <div class="tab" onclick="setTab('sdr1')" id="tab-sdr1"><span class="dot" style="background:var(--purple)"></span>Ítalo</div>
+    <div class="tab" onclick="setTab('sdr2')" id="tab-sdr2"><span class="dot" style="background:var(--teal)"></span>Samuel</div>
+    <div class="tab" onclick="setTab('sdr3')" id="tab-sdr3"><span class="dot" style="background:var(--coral)"></span>Leticia</div>
+  </div>
+
+  <!-- KPI CARDS -->
+  <div class="kpi-grid" id="kpi-cards">
+    <div class="kcard kc-disc">
+      <div class="kcard-label">Discagens</div>
+      <div class="kcard-val" id="kv-disc">—</div>
+      <div class="kcard-meta" id="km-disc">meta: —</div>
+      <div class="kcard-bar"><div class="kcard-bar-fill" id="kb-disc" style="background:var(--purple);width:0%"></div></div>
+    </div>
+    <div class="kcard kc-cont">
+      <div class="kcard-label">Contatos efetivos</div>
+      <div class="kcard-val" id="kv-cont">—</div>
+      <div class="kcard-meta" id="km-cont">—</div>
+      <div class="kcard-bar"><div class="kcard-bar-fill" id="kb-cont" style="background:var(--teal);width:0%"></div></div>
+    </div>
+    <div class="kcard kc-qual">
+      <div class="kcard-label">Qualificados</div>
+      <div class="kcard-val" id="kv-qual">—</div>
+      <div class="kcard-meta" id="km-qual">—</div>
+      <div class="kcard-bar"><div class="kcard-bar-fill" id="kb-qual" style="background:#E6C96A;width:0%"></div></div>
+    </div>
+    <div class="kcard kc-agd">
+      <div class="kcard-label">Reun. Agendadas</div>
+      <div class="kcard-val" id="kv-agd">—</div>
+      <div class="kcard-meta" id="km-agd">meta: —</div>
+      <div class="kcard-bar"><div class="kcard-bar-fill" id="kb-agd" style="background:var(--gold);width:0%"></div></div>
+    </div>
+    <div class="kcard kc-real">
+      <div class="kcard-label">Reun. Realizadas</div>
+      <div class="kcard-val" id="kv-real">—</div>
+      <div class="kcard-meta" id="km-real">—</div>
+      <div class="kcard-bar"><div class="kcard-bar-fill" id="kb-real" style="background:var(--green);width:0%"></div></div>
+    </div>
+    <div class="kcard kc-noshow">
+      <div class="kcard-label">No-show</div>
+      <div class="kcard-val" id="kv-noshow">—</div>
+      <div class="kcard-meta" id="km-noshow">—</div>
+      <div class="kcard-bar"><div class="kcard-bar-fill" id="kb-noshow" style="background:var(--coral);width:0%"></div></div>
+    </div>
+  </div>
+
+  <!-- FUNIL DE CONVERSÃO -->
+  <div class="funil-section">
+    <div class="section-title">Funil de conversão</div>
+    <div class="funil-steps" id="funil-steps">
+      <!-- rendered by JS -->
+    </div>
+  </div>
+
+  <!-- TABELA DIÁRIA -->
+  <div class="table-section">
+    <div class="section-title">Lançamento diário — <span id="table-sdr-label" style="color:var(--gold)">Consolidado</span></div>
+    <div class="table-scroll">
+      <table>
+        <thead>
+          <tr>
+            <th style="text-align:left">Dia</th>
+            <th>Discagens</th>
+            <th>Contatos</th>
+            <th>Qualificados</th>
+            <th>Agendadas</th>
+            <th>Realizadas</th>
+            <th>No-show</th>
+          </tr>
+        </thead>
+        <tbody id="tbody"></tbody>
+        <tfoot>
+          <tr>
+            <td>Total semana</td>
+            <td id="ft-disc">—</td>
+            <td id="ft-cont">—</td>
+            <td id="ft-qual">—</td>
+            <td id="ft-agd">—</td>
+            <td id="ft-real">—</td>
+            <td id="ft-noshow">—</td>
+          </tr>
+        </tfoot>
+      </table>
+    </div>
+  </div>
+
+  <!-- CARDS INDIVIDUAIS DOS SDRS (visível só no consolidado) -->
+  <div id="sdr-cards-section">
+    <div class="section-title" style="margin-bottom:12px">Comparativo SDRs</div>
+    <div class="sdr-grid" id="sdr-grid"></div>
+  </div>
+
+</div>
+
+<!-- SAVE BAR -->
+<div class="savebar">
+  <div style="display:flex;flex-direction:column;gap:3px">
+    <span class="save-msg" id="save-msg">Dados não salvos</span>
+    <span style="font-size:10px;color:var(--txt3)" id="saved-weeks"></span>
+  </div>
+  <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+    <button class="save-btn" style="background:transparent;border:1px solid #0A4A44;color:#0FC4B5;font-size:11px;padding:7px 14px" onclick="syncSheets()">⟳ Sincronizar Sheets</button>
+    <button class="save-btn" style="background:transparent;border:1px solid var(--bd);color:var(--txt2);font-size:11px;padding:7px 14px" onclick="exportBackup()">↑ Exportar</button>
+    <button class="save-btn" style="background:transparent;border:1px solid var(--bd);color:var(--txt2);font-size:11px;padding:7px 14px" onclick="showImport()">↓ Importar</button>
+    <button class="save-btn" onclick="saveData()">Salvar</button>
+  </div>
+</div>
+
+<!-- MODAL EXPORT -->
+<div id="modal-export" style="display:none;position:fixed;inset:0;background:rgba(8,15,40,.92);z-index:200;align-items:center;justify-content:center">
+  <div style="background:#0D1535;border:1px solid #253669;border-radius:14px;padding:24px;max-width:540px;width:90%;position:relative">
+    <div style="font-size:13px;font-weight:700;color:#fff;margin-bottom:6px">Backup dos dados</div>
+    <div style="font-size:11px;color:#7A95BE;margin-bottom:12px">Copie o texto abaixo e cole no chat do Claude para guardar o histórico.</div>
+    <textarea id="export-text" readonly style="width:100%;height:120px;background:#080F28;border:1px solid #1D2E58;border-radius:8px;color:#C8A951;font-size:11px;font-family:monospace;padding:10px;resize:none"></textarea>
+    <div style="display:flex;gap:8px;margin-top:12px">
+      <button onclick="copyExport()" style="flex:1;background:var(--gold);color:#080F28;font-family:'Plus Jakarta Sans',sans-serif;font-weight:800;font-size:12px;padding:9px;border:none;border-radius:8px;cursor:pointer">Copiar</button>
+      <button onclick="closeModal('modal-export')" style="background:transparent;border:1px solid #1D2E58;color:#7A95BE;font-family:'Plus Jakarta Sans',sans-serif;font-size:12px;padding:9px 16px;border-radius:8px;cursor:pointer">Fechar</button>
+    </div>
+    <div id="copy-confirm" style="font-size:11px;color:#3DD68C;margin-top:8px;display:none">✓ Copiado! Cole no chat do Claude.</div>
+  </div>
+</div>
+
+<!-- MODAL IMPORT -->
+<div id="modal-import" style="display:none;position:fixed;inset:0;background:rgba(8,15,40,.92);z-index:200;align-items:center;justify-content:center">
+  <div style="background:#0D1535;border:1px solid #253669;border-radius:14px;padding:24px;max-width:540px;width:90%;position:relative">
+    <div style="font-size:13px;font-weight:700;color:#fff;margin-bottom:6px">Restaurar backup</div>
+    <div style="font-size:11px;color:#7A95BE;margin-bottom:12px">Cole aqui o texto de backup que o Claude te devolveu.</div>
+    <textarea id="import-text" placeholder="Cole o backup aqui..." style="width:100%;height:120px;background:#080F28;border:1px solid #1D2E58;border-radius:8px;color:#D8E4F6;font-size:11px;font-family:monospace;padding:10px;resize:none"></textarea>
+    <div id="import-error" style="font-size:11px;color:#F07C5A;margin-top:6px;display:none">Backup inválido. Verifique o texto e tente novamente.</div>
+    <div style="display:flex;gap:8px;margin-top:12px">
+      <button onclick="doImport()" style="flex:1;background:var(--gold);color:#080F28;font-family:'Plus Jakarta Sans',sans-serif;font-weight:800;font-size:12px;padding:9px;border:none;border-radius:8px;cursor:pointer">Restaurar</button>
+      <button onclick="closeModal('modal-import')" style="background:transparent;border:1px solid #1D2E58;color:#7A95BE;font-family:'Plus Jakarta Sans',sans-serif;font-size:12px;padding:9px 16px;border-radius:8px;cursor:pointer">Cancelar</button>
+    </div>
+  </div>
+</div>
+
+<script>
+function exportBackup() {
+  const payload = 'OC_KPI_BACKUP::' + btoa(JSON.stringify(allData));
+  document.getElementById('export-text').value = payload;
+  document.getElementById('modal-export').style.display = 'flex';
+  document.getElementById('copy-confirm').style.display = 'none';
+}
+
+function copyExport() {
+  const txt = document.getElementById('export-text');
+  txt.select();
+  txt.setSelectionRange(0, 99999);
+  try { navigator.clipboard.writeText(txt.value); } catch(e) { document.execCommand('copy'); }
+  document.getElementById('copy-confirm').style.display = 'block';
+}
+
+function showImport() {
+  document.getElementById('import-text').value = '';
+  document.getElementById('import-error').style.display = 'none';
+  document.getElementById('modal-import').style.display = 'flex';
+}
+
+function doImport() {
+  const raw = document.getElementById('import-text').value.trim();
+  try {
+    const json = raw.startsWith('OC_KPI_BACKUP::') ? atob(raw.replace('OC_KPI_BACKUP::','')) : raw;
+    const parsed = JSON.parse(json);
+    allData = parsed;
+    // migra campos faltantes
+    Object.keys(allData).forEach(wk => ensureWeek(wk));
+    saveData();
+    closeModal('modal-import');
+    render();
+    document.getElementById('save-msg').textContent = 'Backup restaurado com sucesso!';
+    document.getElementById('save-msg').style.color = 'var(--green)';
+  } catch(e) {
+    document.getElementById('import-error').style.display = 'block';
+  }
+}
+
+function closeModal(id) {
+  document.getElementById(id).style.display = 'none';
+}
+</script>
+
+<script>
+const DAYS = ['Segunda','Terça','Quarta','Quinta','Sexta'];
+const SDRS = [
+  {id:'sdr1', name:'Ítalo',   tipo:'Contas Menores', av:'IT', avcls:'av-a', meta_agd:10},
+  {id:'sdr2', name:'Samuel',  tipo:'Contas Menores', av:'SA', avcls:'av-b', meta_agd:10},
+  {id:'sdr3', name:'Leticia', tipo:'Key Accounts',   av:'LE', avcls:'av-c', meta_agd:10},
+];
+// metas semanais por SDR
+const META = {disc:150, cont:30, agd:10, real:8};
+const KEY = 'oc_kpi_v1';
+
+let currentWeek = getWeekKey(new Date());
+let currentTab = 'geral';
+let allData = {}; // allData[weekKey][sdrId][dayIdx] = {disc,cont,agd,real,noshow}
+
+function getWeekKey(d) {
+  const dt = new Date(d);
+  dt.setHours(0,0,0,0);
+  dt.setDate(dt.getDate() - ((dt.getDay()+6)%7));
+  return dt.toISOString().slice(0,10);
+}
+
+function weekLabel(key) {
+  const start = new Date(key+'T12:00:00');
+  const end = new Date(key+'T12:00:00');
+  end.setDate(end.getDate()+4);
+  const fmt = d => d.toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit'});
+  return fmt(start)+' – '+fmt(end);
+}
+
+function changeWeek(dir) {
+  const d = new Date(currentWeek+'T12:00:00');
+  d.setDate(d.getDate() + dir*7);
+  currentWeek = getWeekKey(d);
+  render();
+}
+
+function ensureWeek(wk) {
+  if (!allData[wk]) allData[wk] = {};
+  SDRS.forEach(s => {
+    if (!allData[wk][s.id]) {
+      allData[wk][s.id] = DAYS.map(()=>({disc:0,cont:0,qual:0,agd:0,real:0,noshow:0}));
+    } else {
+      // migra dados antigos que não tinham o campo qual
+      allData[wk][s.id] = allData[wk][s.id].map(d => ({
+        disc:d.disc||0, cont:d.cont||0, qual:d.qual||0,
+        agd:d.agd||0, real:d.real||0, noshow:d.noshow||0
+      }));
+    }
+  });
+}
+
+function getTabSdrs() {
+  if (currentTab === 'geral') return SDRS.map(s=>s.id);
+  return [currentTab];
+}
+
+function getAgg(wk, sdrIds) {
+  ensureWeek(wk);
+  const days = DAYS.map((_,i) => {
+    const r = {disc:0,cont:0,qual:0,agd:0,real:0,noshow:0};
+    sdrIds.forEach(sid => {
+      const d = allData[wk][sid][i];
+      r.disc+=d.disc; r.cont+=d.cont; r.qual+=(d.qual||0); r.agd+=d.agd; r.real+=d.real; r.noshow+=d.noshow;
+    });
+    return r;
+  });
+  const tot = {disc:0,cont:0,qual:0,agd:0,real:0,noshow:0};
+  days.forEach(d=>{ for(const k in tot) tot[k]+=d[k]; });
+  return {days, tot};
+}
+
+function setTab(id) {
+  currentTab = id;
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('tab-'+id).classList.add('active');
+  document.getElementById('sdr-cards-section').style.display = id==='geral'?'block':'none';
+  render();
+}
+
+function render() {
+  document.getElementById('week-label').textContent = weekLabel(currentWeek);
+  ensureWeek(currentWeek);
+  const sdrIds = getTabSdrs();
+  const metaMult = currentTab==='geral' ? SDRS.length : 1;
+  const {days, tot} = getAgg(currentWeek, sdrIds);
+
+  // KPI cards
+  const kpis = [
+    {id:'disc', val:tot.disc, meta:META.disc*metaMult, bar:'purple'},
+    {id:'cont', val:tot.cont, meta:null, bar:'teal'},
+    {id:'qual', val:tot.qual, meta:null, bar:'#E6C96A'},
+    {id:'agd',  val:tot.agd,  meta:META.agd*metaMult, bar:'gold'},
+    {id:'real', val:tot.real, meta:null, bar:'green'},
+    {id:'noshow',val:tot.noshow, meta:null, bar:'coral'},
+  ];
+  kpis.forEach(k => {
+    document.getElementById('kv-'+k.id).textContent = k.val;
+    const barpct = k.meta ? Math.min(Math.round(k.val/k.meta*100),100) : 0;
+    document.getElementById('kb-'+k.id).style.width = barpct+'%';
+    const mm = document.getElementById('km-'+k.id);
+    if (k.id==='cont') {
+      const r = tot.disc ? Math.round(tot.cont/tot.disc*100) : 0;
+      mm.textContent = r+'% de conversão de discagem';
+      mm.className='kcard-meta';
+    } else if (k.id==='qual') {
+      const r = tot.cont ? Math.round(tot.qual/tot.cont*100) : 0;
+      mm.textContent = r+'% dos contatos';
+      mm.className='kcard-meta';
+    } else if (k.id==='real') {
+      const r = tot.agd ? Math.round(tot.real/tot.agd*100) : 0;
+      mm.textContent = r+'% das agendadas realizadas';
+      mm.className='kcard-meta';
+    } else if (k.id==='noshow') {
+      const r = tot.agd ? Math.round(tot.noshow/tot.agd*100) : 0;
+      const cls = r>30?'bad':r>15?'warn':'ok';
+      mm.textContent = r+'% das agendadas';
+      mm.className='kcard-meta '+cls;
+    } else if (k.meta) {
+      const pct = Math.round(k.val/k.meta*100);
+      const cls = pct>=100?'ok':pct>=60?'warn':'bad';
+      mm.innerHTML = `meta: <b>${k.meta}</b> &nbsp;·&nbsp; ${pct}%`;
+      mm.className='kcard-meta '+cls;
+    }
+  });
+
+  // Funil
+  const funil = document.getElementById('funil-steps');
+  const steps = [
+    {label:'Discagens',      n:tot.disc,   color:'#8B7EE0', base: tot.disc||1},
+    {label:'Contatos efet.', n:tot.cont,   color:'#0FC4B5', base: tot.disc||1},
+    {label:'Qualificados',   n:tot.qual,   color:'#E6C96A', base: tot.disc||1},
+    {label:'Agendadas',      n:tot.agd,    color:'#C8A951', base: tot.disc||1},
+    {label:'Realizadas',     n:tot.real,   color:'#3DD68C', base: tot.disc||1},
+    {label:'No-show',        n:tot.noshow, color:'#F07C5A', base: tot.disc||1},
+  ];
+  funil.innerHTML = steps.map((s,i) => {
+    const w = s.base>0 ? Math.max(Math.round(s.n/s.base*100),s.n>0?4:0) : 0;
+    const conv = i===0 ? '100%' : (steps[i-1].n>0 ? Math.round(s.n/steps[i-1].n*100)+'%' : '—');
+    const convColor = i===0 ? 'var(--txt3)' : (parseInt(conv)<30?'var(--coral)':parseInt(conv)<60?'var(--gold)':'var(--green)');
+    return `<div class="fstep">
+      <div class="fstep-label">${s.label}</div>
+      <div class="fstep-bar-wrap">
+        <div class="fstep-bar-fill" style="width:${w}%;background:${s.color}20;border-left:3px solid ${s.color}">
+          <span style="color:${s.color}">${s.n}</span>
+        </div>
+      </div>
+      <div class="fstep-conv" style="color:${convColor}">${i===0?'':conv}</div>
+      <div class="fstep-n" style="color:${s.color}">${s.n}</div>
+    </div>`;
+  }).join('');
+
+  // Tabela diária
+  const tbody = document.getElementById('tbody');
+  const tableSdrIds = getTabSdrs();
+  tbody.innerHTML = DAYS.map((day,i) => {
+    if (currentTab === 'geral') {
+      // readonly aggregated
+      const r = {disc:0,cont:0,qual:0,agd:0,real:0,noshow:0};
+      tableSdrIds.forEach(sid=>{ const d=allData[currentWeek][sid][i]; for(const k in r)r[k]+=(d[k]||0); });
+      return `<tr>
+        <td>${day}</td>
+        <td>${r.disc}</td><td>${r.cont}</td><td>${r.qual}</td><td>${r.agd}</td><td>${r.real}</td><td>${r.noshow}</td>
+      </tr>`;
+    } else {
+      const sid = currentTab;
+      const d = allData[currentWeek][sid][i];
+      return `<tr>
+        <td>${day}</td>
+        ${['disc','cont','qual','agd','real','noshow'].map(k=>`<td><input class="input-cell" type="number" min="0" value="${d[k]||0}" onchange="setVal('${sid}',${i},'${k}',this.value)" onblur="setVal('${sid}',${i},'${k}',this.value)"></td>`).join('')}
+      </tr>`;
+    }
+  }).join('');
+
+  // Footer totals
+  ['disc','cont','qual','agd','real','noshow'].forEach(k=>{
+    document.getElementById('ft-'+k).textContent = tot[k];
+  });
+  const lbl = currentTab==='geral'?'Consolidado':SDRS.find(s=>s.id===currentTab)?.name;
+  document.getElementById('table-sdr-label').textContent = lbl;
+
+  // SDR cards (consolidado)
+  const grid = document.getElementById('sdr-grid');
+  grid.innerHTML = SDRS.map(s => {
+    const {tot:st} = getAgg(currentWeek,[s.id]);
+    const pct = Math.min(Math.round(st.agd/META.agd*100),100);
+    const nosPct = st.agd ? Math.round(st.noshow/st.agd*100) : 0;
+    const nosColor = nosPct>30?'var(--coral)':nosPct>15?'var(--gold)':'var(--green)';
+    return `<div class="sdr-card">
+      <div class="sdr-header">
+        <div class="sdr-avatar ${s.avcls}">${s.av}</div>
+        <div><div class="sdr-name">${s.name}</div><div class="sdr-type">${s.tipo}</div></div>
+      </div>
+      <div class="sdr-metrics">
+        <div class="sm"><div class="sm-val">${st.disc}</div><div class="sm-label">Disc.</div></div>
+        <div class="sm"><div class="sm-val">${st.agd}</div><div class="sm-label">Agend.</div></div>
+        <div class="sm"><div class="sm-val" style="color:${nosColor}">${nosPct}%</div><div class="sm-label">No-show</div></div>
+      </div>
+      <div class="sdr-progress">
+        <div class="sp-row"><span class="sp-label">Meta reuniões (${META.agd}/sem)</span><span class="sp-pct">${pct}%</span></div>
+        <div class="sp-track"><div class="sp-fill" style="width:${pct}%"></div></div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function setVal(sdrId, dayIdx, field, val) {
+  ensureWeek(currentWeek);
+  allData[currentWeek][sdrId][dayIdx][field] = Math.max(0, parseInt(val)||0);
+  document.getElementById('save-msg').textContent = 'Alterações não salvas';
+  document.getElementById('save-msg').style.color = 'var(--gold)';
+  render();
+}
+
+async function saveData() {
+  const payload = JSON.stringify(allData);
+  try { await window.storage.set(KEY, payload); } catch(e) {}
+  try { localStorage.setItem(KEY, payload); } catch(e) {}
+  const t = new Date();
+  document.getElementById('save-msg').textContent = 'Salvo às '+t.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
+  document.getElementById('save-msg').style.color = 'var(--green)';
+}
+
+async function loadData() {
+  let parsed = null;
+  try { const r = await window.storage.get(KEY); if(r&&r.value) parsed=JSON.parse(r.value); } catch(e){}
+  if (!parsed) { try { const r=localStorage.getItem(KEY); if(r) parsed=JSON.parse(r); } catch(e){} }
+  if (parsed) {
+    allData = parsed;
+    // mostra semanas com dados salvos
+    const weeks = Object.keys(allData).filter(wk => {
+      return Object.values(allData[wk]).some(days =>
+        days.some(d => (d.disc||0)+(d.cont||0)+(d.agd||0)+(d.real||0)+(d.noshow||0) > 0)
+      );
+    });
+    const el = document.getElementById('saved-weeks');
+    if (el) el.textContent = weeks.length ? 'Semanas salvas: '+weeks.map(w=>weekLabel(w)).join(' · ') : '';
+  }
+  ensureWeek(currentWeek);
+  render();
+  document.getElementById('save-msg').textContent = 'Dados carregados';
+  document.getElementById('save-msg').style.color = 'var(--txt3)';
+}
+
+// ── GOOGLE SHEETS CONFIG ────────────────────────────────────────────────────
+const SHEETS_API_KEY = 'AIzaSyB-47npXNvnwK2FzTPf9aVevWzaQLZoiLg';
+const SHEETS_IDS = {
+  sdr1: '1Efz-mqoBpcOyUul9kubudsgsYULahT8j7bZ2w-cDqRI', // Ítalo
+  sdr2: '1RUqaT35tbSw6BHEDwLdl178GrsrJCvxdALy1AU7pDk4', // Samuel
+  sdr3: '1pqUZ0IlGGHFNAlUuoiaHeikXuTSARxday3zrmmWp9zE', // Leticia
+};
+// Nome da aba em cada planilha (deve ser igual ao nome do SDR)
+const SHEETS_TAB = {
+  sdr1: 'Ítalo',
+  sdr2: 'Samuel',
+  sdr3: 'Leticia',
+};
+// Mapeamento das colunas da planilha para os campos do dashboard
+// C=disc, D=cont, E=qual, F=agd, G=real, H=noshow
+const COL_MAP = ['disc','cont','qual','agd','real','noshow'];
+
+async function fetchSheetData(sdrId) {
+  const sheetId = SHEETS_IDS[sdrId];
+  if (!sheetId) return null;
+  const tab = encodeURIComponent(SHEETS_TAB[sdrId]);
+  // Lê as linhas 7 a 11 (Segunda a Sexta), colunas C a H (dados do funil)
+  const range = `${tab}!B7:H11`;
+  const url = `https://sheets.googleapis.com/v4/spreadsheets/${sheetId}/values/${range}?key=${SHEETS_API_KEY}`;
+  try {
+    const res = await fetch(url);
+    if (!res.ok) throw new Error('HTTP '+res.status);
+    const data = await res.json();
+    return data.values || [];
+  } catch(e) {
+    console.error('Erro ao buscar '+sdrId, e);
+    return null;
+  }
+}
+
+async function syncSheets() {
+  const btn = document.querySelector('[onclick="syncSheets()"]');
+  btn.textContent = '⟳ Sincronizando...';
+  btn.style.opacity = '.6';
+  btn.disabled = true;
+
+  ensureWeek(currentWeek);
+  let synced = 0, errors = [];
+
+  for (const sdr of SDRS) {
+    if (!SHEETS_IDS[sdr.id]) { errors.push(sdr.name+' (sem ID)'); continue; }
+    const rows = await fetchSheetData(sdr.id);
+    if (!rows) { errors.push(sdr.name+' (erro na API)'); continue; }
+
+    // rows[0] = Segunda, rows[1] = Terça ... rows[4] = Sexta
+    // cada row: [nomeDia, disc, cont, qual, agd, real, noshow]
+    rows.forEach((row, i) => {
+      if (i >= 5) return;
+      const vals = row.slice(1); // remove coluna B (nome do dia)
+      COL_MAP.forEach((field, fi) => {
+        allData[currentWeek][sdr.id][i][field] = parseInt(vals[fi]) || 0;
+      });
+    });
+    synced++;
+  }
+
+  await saveData();
+  render();
+
+  btn.textContent = '⟳ Sincronizar Sheets';
+  btn.style.opacity = '1';
+  btn.disabled = false;
+
+  if (errors.length) {
+    document.getElementById('save-msg').textContent = `Sincronizado (${synced}/3). Pendente: ${errors.join(', ')}`;
+    document.getElementById('save-msg').style.color = 'var(--gold)';
+  } else {
+    document.getElementById('save-msg').textContent = `✓ Sheets sincronizado — ${new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'})}`;
+    document.getElementById('save-msg').style.color = 'var(--green)';
+  }
+}
+
+window.addEventListener('load', loadData);
+</script>
+</body>
+</html>
